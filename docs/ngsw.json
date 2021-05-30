@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1622400041663,
+  "timestamp": 1622402676619,
   "index": "//cowin-helper/index.html",
   "assetGroups": [
     {
@@ -13,7 +13,7 @@
       "urls": [
         "//cowin-helper/favicon.ico",
         "//cowin-helper/index.html",
-        "//cowin-helper/main.dd378dae3bff7c042f2e.js",
+        "//cowin-helper/main.bb95902d1ff4d02ef483.js",
         "//cowin-helper/manifest.webmanifest",
         "//cowin-helper/polyfills.62c5fa8278f9cda7c838.js",
         "//cowin-helper/runtime.68893d35a1fc477fa346.js",
@@ -52,8 +52,8 @@
     "//cowin-helper/assets/icons/icon-72x72.png": "c457e56089a36952cd67156f9996bc4ce54a5ed9",
     "//cowin-helper/assets/icons/icon-96x96.png": "3914125a4b445bf111c5627875fc190f560daa41",
     "//cowin-helper/favicon.ico": "22f6a4a3bcaafafb0254e0f2fa4ceb89e505e8b2",
-    "//cowin-helper/index.html": "825ff90a485f9668f14e4ecbc10bf473b5cb1d82",
-    "//cowin-helper/main.dd378dae3bff7c042f2e.js": "4097d846f209836e4d95a54ad54c2bd24ea2c9ba",
+    "//cowin-helper/index.html": "471d2bf6a9fe5c58a337efee486cc24b9997fa83",
+    "//cowin-helper/main.bb95902d1ff4d02ef483.js": "4fba2cb1e87890e2bddfe25588678a71a3f83351",
     "//cowin-helper/manifest.webmanifest": "0daeb632c879769cc644058bdf03d68ca623e08a",
     "//cowin-helper/polyfills.62c5fa8278f9cda7c838.js": "3f012363ef72b7530b31189bb5ccb8660ad7576b",
     "//cowin-helper/runtime.68893d35a1fc477fa346.js": "7c6030bcf353b59fe708711129dfb22c7b02f5da",
