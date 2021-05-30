@@ -9,10 +9,234 @@
   <style type="text/css">@font-face{font-family:'Material Icons';font-style:normal;font-weight:400;src:url(https://fonts.gstatic.com/s/materialicons/v88/flUhRq6tzZclQEJ-Vdg-IuiaDsNcIhQ8tQ.woff2) format('woff2');}.material-icons{font-family:'Material Icons';font-weight:normal;font-style:normal;font-size:24px;line-height:1;letter-spacing:normal;text-transform:none;display:inline-block;white-space:nowrap;word-wrap:normal;direction:ltr;-webkit-font-feature-settings:'liga';-webkit-font-smoothing:antialiased;}</style>
   <link rel="manifest" href="manifest.webmanifest">
   <meta name="theme-color" content="#1976d2">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/css/bootstrap-select.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-table@1.18.3/dist/bootstrap-table.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.3/css/all.css">
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap-table@1.18.3/dist/bootstrap-table.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/min/moment.min.js"></script>
 <style>body,html{height:100%;}body{margin:0;font-family:Roboto,Helvetica Neue,sans-serif;}</style><link rel="stylesheet" href="styles.cfb4855a6c8683521dfa.css" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="styles.cfb4855a6c8683521dfa.css"></noscript></head>
+
 <body>
   <app-root></app-root>
   <noscript>Please enable JavaScript to continue using this application.</noscript>
-<script src="runtime.68893d35a1fc477fa346.js" defer></script><script src="polyfills.62c5fa8278f9cda7c838.js" defer></script><script src="main.bb95902d1ff4d02ef483.js" defer></script>
+<script src="runtime.68893d35a1fc477fa346.js" defer></script><script src="polyfills.62c5fa8278f9cda7c838.js" defer></script><script src="main.fd5c6ba9e62d8e88c6ee.js" defer></script>
+<script>
+  function LinkFormatter(value) {
+    return "<a href='" + value + "' target='_blank'>View Map</a>";
+  }
+
+  function VaccineFeesFormatter(value) {
+    if (value) {
+      value.push(value[0])
+      val = "";
+      value.forEach((vaccineFee) => {
+        val += vaccineFee.vaccine + " - " + vaccineFee.fee + "\n";
+      });
+      return val;
+    }
+    else
+      return "Free";
+  }
+
+
+  var timer = null;
+  function btnCheckAvailabilityCall() {
+    if (timer) {
+      window.clearTimeout(timer);
+      timer = null;
+    }
+    var isSearchByPincode = document.getElementById("searchbypincode").checked;
+    const audioAlertEnable = document.getElementById("audioalert").checked;
+    if (isSearchByPincode) {
+      var dataValue = document.getElementById("pincode").value.trim();
+    } else {
+      var dataValue = document.getElementById("selectDistrict").value;
+    }
+
+    const isValidData = (isSearchByPincode && dataValue?.length == 6) || (!isSearchByPincode && dataValue);
+
+    if (isValidData) {
+      const date = moment(new Date()).format("DD-MM-YYYY");
+      var url = "https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/" + (isSearchByPincode ? "calendarByPin?pincode" : "calendarByDistrict?district_id") + "=" + dataValue + "&date=" + date;
+
+      var availabilityData = [];
+
+      $.ajax({
+        method: "GET",
+        url: url,
+        contentType: "application/json",
+        dataType: 'json',
+        success: function (responseJson) {
+          if (responseJson.centers) {
+            var centers = responseJson["centers"];
+            const vaccine = document.getElementById("selectVaccine").value;
+            const dose1checked = document.getElementById("dose1").checked;
+            const dose2checked = document.getElementById("dose2").checked;
+            const age18Value = document.getElementById("age18").checked ? document.getElementById("age18").value : null;
+            const age45Value = document.getElementById("age45").checked ? document.getElementById("age45").value : null;
+            const freeValue = document.getElementById("free").checked ? document.getElementById("free").value : null;
+            const paidValue = document.getElementById("paid").checked ? document.getElementById("paid").value : null;
+            centers.forEach((center) => {
+              if (center.fee_type == freeValue || center.fee_type == paidValue) {
+                center.sessions.forEach((session) => {
+                  if (
+                    session.available_capacity > 0 && ((dose1checked && session.available_capacity_dose1 > 0) || (dose2checked && session.available_capacity_dose2 > 0))
+                    && (session.min_age_limit == age18Value || session.min_age_limit == age45Value)
+                    && (vaccine == "ALL" || vaccine == session.vaccine)
+                  ) {
+                    var availableSession = {
+                      centerName: center.name + " - " + center.block_name + " - " + center.pincode,
+                      date: session.date,
+                      availableCapacity: session.available_capacity,
+                      available_capacity_dose1: session.available_capacity_dose1,
+                      available_capacity_dose2: session.available_capacity_dose2,
+                      age: session.min_age_limit,
+                      vaccine: session.vaccine,
+                      vaccine_fees: center.vaccine_fees,
+                      googlemaplink: "https://www.google.com/maps/search/" + center.name + " " + center.pincode,
+                    };
+                    availabilityData.push(availableSession);
+                  }
+                });
+              }
+            });
+          }
+
+          if (availabilityData.length == 0) {
+            $("#notAvailableMessage").removeClass('d-none');
+            $("#tablediv").addClass('d-none');
+          } else {
+            $("#notAvailableMessage").addClass('d-none');
+            $("#tablediv").removeClass('d-none');
+            if (audioAlertEnable)
+              audioalert();
+            document.getElementById("audioalert").checked = false;
+            if (document.getElementById("opencowin").checked)
+              window.open("https://selfregistration.cowin.gov.in/");
+          }
+          $('#table').bootstrapTable("load", availabilityData);
+        },
+        error: function (jqxhr, textStatus, error) {
+          if (jqxhr.status == 400) {
+            alert("Invalid pincode or district!");
+          }
+        },
+        complete: function () {
+          if (document.getElementById("autocheck").checked) {
+            autoCheckTime = document.getElementById("autoCheckTime").value ?? 1;
+            timer = setTimeout(btnCheckAvailabilityCall, 1000 * 60 * autoCheckTime);
+          }
+        }
+      })
+    } else {
+      alert("Invalid pincode or district!");
+      document.getElementById("autocheck").checked = false;
+    }
+  };
+
+
+
+  $(document).ready(function () {
+    setTimeout(function () {
+      var url = new URL(document.location);
+      var params = url.searchParams;
+      var pincode = params.get("pincode");
+      if (pincode) {
+        $("#pincode").val(pincode);
+      }
+      var age = params.get("age");
+      if (age && age == 45) {
+        document.getElementById("age45").checked = true;
+      }
+      var autocheck = params.get("autocheck");
+      if (autocheck) {
+        document.getElementById("autocheck").checked = true;
+        $("#btnCheckAvailability").click();
+      }
+      var audioalert = params.get("audioalert");
+      if (audioalert) {
+        document.getElementById("audioalert").checked = true;
+      }
+      opencowin = params.get("opencowin");
+      if (opencowin) {
+        document.getElementById("opencowin").checked = true;
+      }
+
+      $('#pincode').keypress(function (e) {
+        var key = e.which;
+        if (key == 13)  // the enter key code
+        {
+          $("#btnCheckAvailability").click();
+          return false;
+        }
+      });
+
+      $("#table").bootstrapTable({
+        data: [],
+        autoRefresh: true,
+      });
+
+      $('#selectState').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
+        if (isSelected) {
+          $.ajax({
+            type: "GET",
+            url: "https://cdn-api.co-vin.in/api/v2/admin/location/districts/" + this.value,
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (data) {
+              $('#selectDistrict').empty();
+              $.each(data.districts, function () {
+                var options = "<option " + "value='" + this.district_id + "'>" + this.district_name + "";
+                $("#selectDistrict").append(options);
+              });
+              $('#selectDistrict').selectpicker('refresh');
+            }
+          });
+        }
+      });
+
+      $('input[type=radio][name=searchBy]').change(function () {
+        if (this.value == 'district') {
+          $("#pincodeGroup").addClass('d-none');
+          $("#districtGroup").removeClass('d-none');
+        }
+        else {
+          $("#pincodeGroup").removeClass('d-none');
+          $("#districtGroup").addClass('d-none');
+        }
+      });
+
+      $('input[type=checkbox][id=autocheck]').change(function () {
+        if (this.checked) {
+          btnCheckAvailabilityCall();
+        }
+      });
+
+      $.ajax({
+        type: "GET",
+        url: "https://cdn-api.co-vin.in/api/v2/admin/location/states",
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        success: function (data) {
+          $.each(data.states, function () {
+            var options = "<option " + "value='" + this.state_id + "'>" + this.state_name + "";
+            $("#selectState").append(options);
+          });
+          $('#selectState').selectpicker('refresh');
+        }
+      });
+    }, 1000);
+  });
+
+  function audioalert() {
+    const msg = new SpeechSynthesisUtterance("Vaccine center is now available.");
+    window.speechSynthesis.speak(msg);
+  };
+
+</script>
 
 </body></html>
