@@ -1,0 +1,143 @@
+<div class="container">
+    <br />
+    <div class="page-header">
+        <h2>Check CoWIN vaccine center(s) availability</h2>
+    </div>
+    <br />
+    <form>
+        <div class="form-row">
+            <div class="col-auto">
+                <label class="form-check-label mb-3 font-weight-bold mr-2">Age </label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input mb-3" type="checkbox" id="age18" value="18" checked />
+                <label class="form-check-label mb-3" for="age18">18+</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input mb-3" type="checkbox" id="age45" value="45" />
+                <label class="form-check-label mb-3" for="age45">45+</label>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="col-auto">
+                <label class="form-check-label mb-3 font-weight-bold mr-2">Fees </label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input mb-3" type="checkbox" id="free" value="Free" checked />
+                <label class="form-check-label mb-3" for="free">Free</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input mb-3" type="checkbox" id="paid" value="Paid" />
+                <label class="form-check-label mb-3" for="paid">Paid</label>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="col-auto">
+                <label class="form-check-label mb-3 font-weight-bold mr-2">Dose </label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input mb-3" type="checkbox" id="dose1" value="1" checked />
+                <label class="form-check-label mb-3" for="dose1">Dose 1</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input mb-3" type="checkbox" id="dose2" value="2" />
+                <label class="form-check-label mb-3" for="dose2">Dose 2</label>
+            </div>
+        </div>
+        <div class="form-inline">
+            <label class="my-1 mr-2 mb-3 font-weight-bold" for="selectVaccine">Vaccine </label>
+            <select class="custom-select my-1 mr-2 mb-3" id="selectVaccine">
+                <option value="ALL" selected>ALL</option>
+                <option value="COVISHIELD">Covishield</option>
+                <option value="COVAXIN">Covaxin</option>
+                <option value="SUPTIN V">Sputnik V</option>
+            </select>
+        </div>
+        <div class="form-row">
+            <div class="col-auto">
+                <label class="form-check-label mb-3 font-weight-bold mr-2">Search By</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input id="searchbypincode" class="form-check-input mb-3" type="radio" name="searchBy" value="pincode"
+                    checked />
+                <label class="form-check-label mb-3" for="searchpincode">Pincode</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input id="searchbydistrict" class="form-check-input mb-3" type="radio" name="searchBy"
+                    value="district" />
+                <label class="form-check-label mb-3" for="searchdistrict">District</label>
+            </div>
+        </div>
+        <div class="form-row">
+            <div id="pincodeGroup" class="col-auto">
+                <input id="pincode" class="form-control mb-3" type="text" placeholder="Pincode" />
+            </div>
+            <div id="districtGroup" class="col-auto d-none">
+                <select id="selectState" class="form-control selectpicker mb-3 border" data-live-search="true"
+                    data-size="10" data-width="250px" data-style="btn-default" title="Select state">
+                </select>
+                <select id="selectDistrict" class="form-control selectpicker mb-3 border" data-live-search="true"
+                    data-size="10" data-width="250px" data-style="btn-default" title="Select district">
+                </select>
+            </div>
+            <div class="col-auto">
+                <button mat-raised-button color="primary" id="btnCheckAvailability" type="button"
+                    onclick='btnCheckAvailabilityCall()'>Check
+                    availability</button>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="col-auto">
+                <div class="form-check form-check-inline">
+                    <input id="autocheck" class="form-check-input mb-3" type="checkbox" />
+                    <label class="form-check-label mb-3" for="autocheck">Auto check after every <input
+                            id="autoCheckTime" class="text-center border rounded" style="width: 30px;" type="text"
+                            value="1" /> minute(s).</label>
+                </div>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="col-auto">
+                <div class="form-check form-check-inline">
+                    <input id="audioalert" class="form-check-input mb-3" type="checkbox" />
+                    <label class="form-check-label mb-3" for="audioalert">Alert me when center is available.
+                        (Alert will be disabled once center is available) <a href="#" onclick='audioalert()'>click
+                            here to play alert sample</a> </label>
+
+                </div>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="col-auto">
+                <div class="form-check form-check-inline">
+                    <input id="opencowin" class="form-check-input mb-3" type="checkbox" />
+                    <label class="form-check-label mb-3" for="opencowin">Open CoWIN login page in new tab when
+                        center is available.</label>
+                </div>
+            </div>
+        </div>
+    </form>
+    <p>Only available center(s) will be displayed.</p>
+    <div id="notAvailableMessage" class="alert alert-danger d-none" role="alert">
+        Center not available!
+    </div>
+    <div id="tablediv" class="table-responsive d-none">
+        <table id="table" class="table-striped" data-search="true" data-show-toggle="true" data-show-fullscreen="true"
+            data-show-columns="true" data-sortable="true">
+            <thead>
+                <tr>
+                    <th data-field="centerName" data-sortable="true">Center Name</th>
+                    <th data-field="date" data-sortable="true">Date</th>
+                    <!-- <th data-field="availableCapacity" data-sortable="true">Availability</th> -->
+                    <th data-field="available_capacity_dose1" data-sortable="true">Dose 1 Availability</th>
+                    <th data-field="available_capacity_dose2" data-sortable="true">Dose 2 Availability</th>
+                    <th data-field="age" data-sortable="true">Age</th>
+                    <th data-field="vaccine" data-sortable="true">Vaccine Type</th>
+                    <th data-field="vaccine_fees" data-sortable="true" data-formatter="VaccineFeesFormatter">Vaccine
+                        - Fees</th>
+                    <th data-field="googlemaplink" data-formatter="LinkFormatter">Google Map</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>

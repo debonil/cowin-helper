@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { SwUpdateCheckerService } from './services/sw-update-checker.service';
 
 @Component({
   selector: 'app-root',
@@ -6,5 +7,7 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'cowin-helper';
+  constructor(private updateChecker: SwUpdateCheckerService) {
+    this.updateChecker.checkForUpdates();
+  }
 }
